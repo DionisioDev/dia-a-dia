@@ -81,6 +81,12 @@
   .who{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
   .who .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
   .pdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .freq{flex:0 0 auto;font-size:10px;font-weight:600;color:var(--muted);background:var(--soft);padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .achore{padding:12px 0;border-top:1px solid var(--line)} .achore:first-child{border-top:0}
+  .aline{display:flex;align-items:center;gap:10px}
+  .aline .label{flex:1;min-width:0;font-size:14.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .acontrols{display:flex;gap:8px;margin-top:9px}
+  .acontrols .rowsel{flex:1 1 0;width:100%}
   /* formulários */
   .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
   input,select{font-family:var(--body);font-size:14px;width:100%;padding:10px 11px;border:1px solid var(--line);
@@ -161,6 +167,8 @@ const COLORS = [
 const TODOS = {bg:"#EFEAD9",ink:"#6B5D3E",dot:"#9C8A5E"};
 const NEUTRAL = {bg:"#E6E2D6",ink:"#5B5240",dot:"#82704E"};
 const MES=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const FREQS=[{id:"diario",label:"Diário"},{id:"semanal",label:"Semanal"},{id:"quinzenal",label:"Quinzenal"},{id:"mensal",label:"Mensal"}];
+const freqLabel = f => (FREQS.find(x=>x.id===f)||FREQS[1]).label;
 
 /* ====== semente (importada do que vocês já faziam + exemplos) ====== */
 function seed(){
@@ -168,54 +176,79 @@ function seed(){
   return {
     people:[{id:sam,name:"Samara",color:0},{id:dan,name:"Daniel",color:1}],
     chores:[
-      {id:uid(),name:"Lavar a louça",who:"todos"},
-      {id:uid(),name:"Lavar a roupa",who:sam},
-      {id:uid(),name:"Varrer a casa",who:dan},
-      {id:uid(),name:"Passar pano no chão",who:dan},
-      {id:uid(),name:"Faxina do banheiro",who:sam},
-      {id:uid(),name:"Faxina da cozinha",who:sam},
-      {id:uid(),name:"Tirar pó e organizar",who:sam},
-      {id:uid(),name:"Cama, toalhas e dobrar roupa",who:dan},
-      {id:uid(),name:"Compras e cardápio",who:"todos"},
-      {id:uid(),name:"Lavar as janelas",who:"todos"},
+      {id:uid(),name:"Lavar a louça",who:"todos",freq:"diario"},
+      {id:uid(),name:"Lavar a roupa",who:sam,freq:"semanal"},
+      {id:uid(),name:"Varrer a casa",who:dan,freq:"semanal"},
+      {id:uid(),name:"Passar pano no chão",who:dan,freq:"semanal"},
+      {id:uid(),name:"Faxina do banheiro",who:sam,freq:"semanal"},
+      {id:uid(),name:"Faxina da cozinha",who:sam,freq:"semanal"},
+      {id:uid(),name:"Tirar pó e organizar",who:sam,freq:"semanal"},
+      {id:uid(),name:"Cama, toalhas e dobrar roupa",who:dan,freq:"semanal"},
+      {id:uid(),name:"Compras e cardápio",who:"todos",freq:"semanal"},
+      {id:uid(),name:"Lavar as janelas",who:"todos",freq:"quinzenal"},
     ],
     log:[],
   };
 }
 
-/* ====== persistência (localStorage + memória) ====== */
-let store={mode:"mem",mem:null};
-function initStore(){
+/* ====== Firebase (opcional) — sincroniza entre os aparelhos da Sah e do Dan ======
+   Crie um projeto grátis em firebase.google.com, ative o Firestore e cole o objeto
+   de config abaixo (no lugar de null). Enquanto for null, salva só neste aparelho. */
+const FIREBASE_CONFIG = null;
+const FB_DOC = "casa/organizacao";
+
+/* ====== persistência: Firebase -> localStorage -> memória ====== */
+let store={mode:"mem",mem:null,fb:null,fresh:false};
+async function initStore(){
+  if(FIREBASE_CONFIG){
+    try{
+      const app=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const fs=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      const a=app.initializeApp(FIREBASE_CONFIG); const db=fs.getFirestore(a);
+      store.fb={fs,db,ref:fs.doc(db,FB_DOC)}; store.mode="fb"; return;
+    }catch(e){ console.warn("Firebase falhou, usando local",e); }
+  }
   try{ localStorage.setItem("__t","1"); localStorage.removeItem("__t"); store.mode="local"; }
   catch(e){ store.mode="mem"; }
 }
-function loadData(){
+async function loadData(){
   try{
-    if(store.mode==="local"){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); }
+    if(store.mode==="fb"){ const s=await store.fb.fs.getDoc(store.fb.ref); if(s.exists()) return normalize(s.data().d); }
+    else if(store.mode==="local"){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); }
     else if(store.mem) return normalize(store.mem);
   }catch(e){ console.warn(e); }
-  return seed();
+  store.fresh=true; return seed();
 }
 let saveT=null;
 function save(){
   clearTimeout(saveT);
-  saveT=setTimeout(()=>{
+  saveT=setTimeout(async()=>{
     try{
-      if(store.mode==="local") localStorage.setItem("casa_org",JSON.stringify(D));
-      else store.mem=JSON.parse(JSON.stringify(D));
+      if(store.mode==="fb"){ await store.fb.fs.setDoc(store.fb.ref,{d:D}); }
+      else if(store.mode==="local"){ localStorage.setItem("casa_org",JSON.stringify(D)); }
+      else { store.mem=JSON.parse(JSON.stringify(D)); }
     }catch(e){ console.warn("save",e); }
   },250);
 }
 function normalize(d){
   d.people=d.people||[]; d.chores=d.chores||[]; d.log=d.log||[];
   const ids=new Set(d.people.map(p=>p.id));
-  d.chores.forEach(c=>{ if(c.who!=="todos" && !ids.has(c.who)) c.who="todos"; });
+  d.chores.forEach(c=>{ if(c.who!=="todos" && !ids.has(c.who)) c.who="todos"; if(!c.freq) c.freq="semanal"; });
   return d;
 }
 
 /* ====== estado + helpers ====== */
 let D=null, newColor=0;
-function mondayKey(){ const x=new Date(); const off=(x.getDay()+6)%7; x.setDate(x.getDate()-off); x.setHours(0,0,0,0); return x.toISOString().slice(0,10); }
+function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function mondayKey(){ const x=new Date(); const off=(x.getDay()+6)%7; x.setDate(x.getDate()-off); x.setHours(0,0,0,0); return ymd(x); }
+function periodKey(freq){
+  const now=new Date();
+  if(freq==="diario") return "d"+ymd(now);
+  if(freq==="mensal") return "m"+now.getFullYear()+"-"+(now.getMonth()+1);
+  const mk=mondayKey();
+  if(freq==="quinzenal"){ const wn=Math.floor(new Date(mk+"T00:00:00").getTime()/(7*864e5)); return "q"+Math.floor(wn/2); }
+  return "w"+mk; // semanal
+}
 function weekRange(){
   const mon=new Date(mondayKey()); const sun=new Date(mon); sun.setDate(mon.getDate()+6);
   return `Semana de ${mon.getDate()} de ${MES[mon.getMonth()]} a ${sun.getDate()} de ${MES[sun.getMonth()]}`;
@@ -223,15 +256,16 @@ function weekRange(){
 const personById = id => D.people.find(p=>p.id===id);
 function colorOf(who){ if(who==="todos") return TODOS; const p=personById(who); return p?COLORS[p.color%COLORS.length]:NEUTRAL; }
 function labelOf(who){ if(who==="todos") return "Todos"; const p=personById(who); return p?p.name:"—"; }
-const isDone = choreId => D.log.some(e=>e.choreId===choreId && e.wk===mondayKey());
+function isDone(choreId){ const c=D.chores.find(x=>x.id===choreId); if(!c) return false; const pk=periodKey(c.freq); return D.log.some(e=>e.choreId===choreId && e.period===pk); }
 function whoChip(who){ const c=colorOf(who); return `<span class="who" style="background:${c.bg};color:${c.ink}"><span class="d" style="background:${c.dot}"></span>${esc(labelOf(who))}</span>`; }
 
 function toggleChore(id){
-  const wk=mondayKey(), c=D.chores.find(x=>x.id===id); if(!c) return;
+  const c=D.chores.find(x=>x.id===id); if(!c) return;
+  const wk=mondayKey(), pk=periodKey(c.freq);
   if(isDone(id)){
-    for(let i=D.log.length-1;i>=0;i--){ if(D.log[i].choreId===id && D.log[i].wk===wk){ D.log.splice(i,1); break; } }
+    for(let i=D.log.length-1;i>=0;i--){ if(D.log[i].choreId===id && D.log[i].period===pk){ D.log.splice(i,1); break; } }
   }else{
-    D.log.push({id:uid(),choreId:id,choreName:c.name,who:c.who,whoName:labelOf(c.who),ts:new Date().toISOString(),wk});
+    D.log.push({id:uid(),choreId:id,choreName:c.name,who:c.who,whoName:labelOf(c.who),freq:c.freq,ts:new Date().toISOString(),wk,period:pk});
   }
   save();
 }
@@ -274,6 +308,7 @@ function renderSemana(){
         <div class="task ${isDone(c.id)?"done":""}" role="checkbox" aria-checked="${isDone(c.id)}" tabindex="0" data-chore="${c.id}">
           <span class="box"><span class="ms" aria-hidden="true">check</span></span>
           <span class="label">${esc(c.name)}</span>
+          <span class="freq">${freqLabel(c.freq)}</span>
         </div>`).join("")}</div>`;
   });
   el.innerHTML=`
@@ -286,7 +321,7 @@ function renderSemana(){
     </div>
     ${body}
     <button class="reset" id="clearWeek">Limpar marcações desta semana</button>
-    <p class="tiny">As marcações reiniciam sozinhas toda segunda. O histórico fica salvo no Desempenho.</p>`;
+    <p class="tiny">Cada afazer reinicia conforme a frequência (diário, semanal, quinzenal, mensal). O histórico fica no Desempenho.</p>`;
   el.querySelectorAll(".task").forEach(t=>{
     const go=()=>{ toggleChore(t.dataset.chore); renderSemana(); };
     t.addEventListener("click",go);
@@ -308,6 +343,7 @@ function whoOptions(sel){
     .concat(D.people.map(p=>`<option value="${p.id}" ${sel===p.id?"selected":""}>${esc(p.name)}</option>`));
   return opts.join("");
 }
+function freqOptions(sel){ return FREQS.map(f=>`<option value="${f.id}" ${sel===f.id?"selected":""}>${f.label}</option>`).join(""); }
 function renderAfazeres(){
   const el=document.getElementById("t-afazeres");
   el.innerHTML=`
@@ -315,16 +351,22 @@ function renderAfazeres(){
     <div class="card" style="padding:16px">
       <div class="formgrid">
         <div class="full"><label class="fl">Nome do afazer</label><input id="aName" placeholder="Ex: Limpar o fogão"></div>
-        <div class="full"><label class="fl">Quem faz</label><select id="aWho">${whoOptions("todos")}</select></div>
+        <div><label class="fl">Quem faz</label><select id="aWho">${whoOptions("todos")}</select></div>
+        <div><label class="fl">Frequência</label><select id="aFreq">${freqOptions("semanal")}</select></div>
         <div class="full"><button class="btn pri" id="aAdd"><span class="ms" aria-hidden="true">add</span> Adicionar afazer</button></div>
       </div>
     </div>
     <div class="h"><span class="ms" aria-hidden="true">cleaning_services</span> Afazeres da casa<span class="cnt">${D.chores.length}</span></div>
     <div class="card">${D.chores.length?D.chores.map(c=>`
-      <div class="row">
-        <span class="label">${esc(c.name)}</span>
-        <select class="rowsel" data-cwho="${c.id}">${whoOptions(c.who)}</select>
-        <button class="del" data-cdel="${c.id}" aria-label="Excluir ${esc(c.name)}"><span class="ms" aria-hidden="true">close</span></button>
+      <div class="achore">
+        <div class="aline">
+          <span class="label">${esc(c.name)}</span>
+          <button class="del" data-cdel="${c.id}" aria-label="Excluir ${esc(c.name)}"><span class="ms" aria-hidden="true">close</span></button>
+        </div>
+        <div class="acontrols">
+          <select class="rowsel" data-cwho="${c.id}" aria-label="Quem faz">${whoOptions(c.who)}</select>
+          <select class="rowsel" data-cfreq="${c.id}" aria-label="Frequência">${freqOptions(c.freq)}</select>
+        </div>
       </div>`).join(""):`<div class="muted" style="padding:8px 0">Nada por aqui ainda.</div>`}</div>`;
   document.getElementById("aAdd").addEventListener("click",addChore);
   document.getElementById("aName").addEventListener("keydown",e=>{ if(e.key==="Enter") addChore(); });
@@ -335,11 +377,15 @@ function renderAfazeres(){
   el.querySelectorAll("[data-cwho]").forEach(s=>s.addEventListener("change",()=>{
     const c=D.chores.find(x=>x.id===s.dataset.cwho); if(c){ c.who=s.value; save(); }
   }));
+  el.querySelectorAll("[data-cfreq]").forEach(s=>s.addEventListener("change",()=>{
+    const c=D.chores.find(x=>x.id===s.dataset.cfreq); if(c){ c.freq=s.value; save(); }
+  }));
 }
 function addChore(){
-  const i=document.getElementById("aName"), name=i.value.trim(), who=document.getElementById("aWho").value;
+  const name=document.getElementById("aName").value.trim();
+  const who=document.getElementById("aWho").value, freq=document.getElementById("aFreq").value;
   if(!name) return;
-  D.chores.push({id:uid(),name,who}); save(); renderAfazeres();
+  D.chores.push({id:uid(),name,who,freq}); save(); renderAfazeres();
 }
 
 /* ====== MORADORES ====== */
@@ -420,14 +466,16 @@ function renderDesempenho(){
 }
 
 /* ====== boot ====== */
-initStore();
-D=loadData();
-(function(){
+(async function(){
+  await initStore();
+  D=await loadData();
+  if(store.fresh) save(); // fixa o seed no 1º acesso
   const dot=document.getElementById("modeDot"), txt=document.getElementById("modeTxt");
-  if(store.mode==="local"){ txt.textContent="salvo neste aparelho"; dot.style.background="var(--accent-dot)"; }
+  if(store.mode==="fb"){ txt.textContent="sincronizado"; dot.style.background="var(--accent-dot)"; }
+  else if(store.mode==="local"){ txt.textContent="salvo neste aparelho"; dot.style.background="var(--accent-dot)"; }
   else { txt.textContent="só nesta sessão"; dot.style.background="var(--muted)"; }
+  buildTabs(); selectTab("semana");
 })();
-buildTabs(); selectTab("semana");
 </script>
 <script>
   if ("serviceWorker" in navigator) {
