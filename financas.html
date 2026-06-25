@@ -266,6 +266,7 @@ async function initStore(){
       const authMod=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
       const fs=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
       const a=app.initializeApp(FIREBASE_CONFIG); const auth=authMod.getAuth(a); const db=fs.getFirestore(a);
+      try{ await authMod.setPersistence(auth, authMod.browserLocalPersistence); }catch(_){}
       let user=await new Promise(r=>{ const off=authMod.onAuthStateChanged(auth,u=>{off();r(u);}); });
       if(!user) await fbLogin(authMod,auth);
       store.fb={fs,db,ref:fs.doc(db,FB_DOC)}; store.mode="fb"; return;
