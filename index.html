@@ -1,0 +1,199 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Casa — Sah &amp; Dan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.7.0/tabler-icons.min.css">
+<style>
+  :root{
+    --paper:#F8F4E3; --surface:#FEFCF7; --ink:#5A352A; --muted:#82704E; --line:#E2D8BC; --soft:#F1EAD2;
+    --sam-bg:#E7ECDF; --sam:#3F5238; --sam-dot:#5B7553;
+    --dan-bg:#EDE3D6; --dan:#5A352A; --dan-dot:#835033;
+    --jun-bg:#F5E2D7; --jun:#7A2E18; --jun-dot:#A33B20;
+    --org:#5B7553; --org-bg:#E7ECDF; --org-ink:#3F5238;
+    --fin:#835033; --fin-bg:#EDE3D6; --fin-ink:#5A352A;
+    --disp:"Bricolage Grotesque", system-ui, sans-serif;
+    --body:"Inter", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5;
+    padding:22px 16px 60px;display:flex;justify-content:center}
+  .wrap{width:100%;max-width:580px}
+  /* header */
+  .brand{display:flex;align-items:center;gap:10px;color:var(--muted)}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--ink);color:var(--paper);
+    display:flex;align-items:center;justify-content:center;font-size:17px}
+  .brand b{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:.01em}
+  .brand .tag{margin-left:auto;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+  .greet{margin:22px 0 4px}
+  .greet h1{font-family:var(--disp);font-weight:700;font-size:32px;letter-spacing:-.02em;margin:0;line-height:1.1}
+  .greet p{margin:6px 0 0;color:var(--muted);font-size:14px}
+  .seclabel{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;
+    margin:30px 4px 12px}
+  /* area card */
+  .area{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:14px;
+    transition:border-color .15s, transform .1s}
+  .area:hover{border-color:var(--line)}
+  .ahead{display:flex;align-items:center;gap:14px;padding:18px 18px;cursor:pointer;position:relative}
+  .ahead::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0}
+  .area.org .ahead::before{background:var(--org)}
+  .area.fin .ahead::before{background:var(--fin)}
+  .aicon{flex:0 0 auto;width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:23px}
+  .area.org .aicon{background:var(--org-bg);color:var(--org-ink)}
+  .area.fin .aicon{background:var(--fin-bg);color:var(--fin-ink)}
+  .atitle{flex:1;min-width:0}
+  .atitle h2{font-family:var(--disp);font-weight:600;font-size:18px;margin:0;line-height:1.2}
+  .atitle p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  .chev{flex:0 0 auto;color:var(--muted);font-size:20px;transition:transform .2s}
+  .area.open .chev{transform:rotate(180deg)}
+  .status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;margin-top:6px}
+  .status.ok{background:var(--org-bg);color:var(--org-ink)}
+  .status.work{background:var(--fin-bg);color:var(--fin-ink)}
+  .status .dt{width:6px;height:6px;border-radius:50%;background:currentColor}
+  /* expandable body */
+  .abody{max-height:0;overflow:hidden;transition:max-height .28s ease}
+  .area.open .abody{max-height:760px}
+  .abody-in{padding:4px 18px 20px}
+  .divider{height:1px;background:var(--line);margin:0 0 16px}
+  /* metric chips */
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .metric{background:var(--soft);border-radius:13px;padding:12px 12px}
+  .metric .k{font-size:11px;color:var(--muted);font-weight:500;line-height:1.3}
+  .metric .v{font-family:var(--disp);font-weight:600;font-size:18px;margin-top:5px;letter-spacing:-.01em}
+  .metric .v.fin{color:var(--fin-ink)}
+  /* today task mini list */
+  .todayline{font-size:13px;color:var(--muted);margin:0 0 10px}
+  .tlist{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+  .titem{display:flex;align-items:center;gap:10px;font-size:14px}
+  .titem .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  .titem.sam .d{background:var(--sam-dot)} .titem.dan .d{background:var(--dan-dot)} .titem.jun .d{background:var(--jun-dot)}
+  .titem .who{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted)}
+  .empty{font-size:14px;color:var(--muted);padding:4px 0 12px}
+  /* feature list */
+  .feat{font-size:13.5px;color:var(--ink);margin:0 0 12px}
+  .feat ul{margin:8px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+  .feat li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink)}
+  .feat li i{color:var(--fin);font-size:16px;margin-top:1px}
+  .note{font-size:12.5px;color:var(--muted);background:var(--soft);border-radius:11px;padding:10px 12px;margin-bottom:14px;line-height:1.5}
+  /* open button */
+  .open-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;
+    font-family:var(--body);font-size:15px;font-weight:600;border:0;cursor:pointer;text-decoration:none;transition:.12s}
+  .area.org .open-btn{background:var(--org);color:#fff}
+  .area.fin .open-btn{background:var(--fin-bg);color:var(--fin-ink);border:1px solid #E2D8BC}
+  .open-btn:active{transform:scale(.99)}
+  .foot{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
+  @media (max-width:420px){.feat ul{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="brand">
+    <span class="mark"><i class="ti ti-home"></i></span>
+    <b>Casa</b>
+    <span class="tag" id="weekday" style="color:var(--muted)"></span>
+  </div>
+
+  <div class="greet">
+    <h1 id="hello">Olá</h1>
+    <p id="subdate"></p>
+  </div>
+
+  <div class="seclabel">Áreas</div>
+
+  <!-- ORGANIZAÇÃO -->
+  <div class="area org" id="cardOrg">
+    <div class="ahead" data-toggle="cardOrg">
+      <span class="aicon"><i class="ti ti-sparkles"></i></span>
+      <span class="atitle">
+        <h2>Organização &amp; limpeza</h2>
+        <p>Rotina da semana, faxina e roupa</p>
+        <span class="status ok"><span class="dt"></span><span id="orgStatus">—</span></span>
+      </span>
+      <i class="ti ti-chevron-down chev"></i>
+    </div>
+    <div class="abody"><div class="abody-in">
+      <div class="divider"></div>
+      <p class="todayline" id="todayLabel"></p>
+      <div class="tlist" id="todayTasks"></div>
+      <a class="open-btn" href="organizacao.html"><i class="ti ti-arrow-right"></i> Abrir o painel da semana</a>
+    </div></div>
+  </div>
+
+  <!-- FINANÇAS -->
+  <div class="area fin" id="cardFin">
+    <div class="ahead" data-toggle="cardFin">
+      <span class="aicon"><i class="ti ti-wallet"></i></span>
+      <span class="atitle">
+        <h2>Finanças</h2>
+        <p>Orçamento, dívidas e metas</p>
+        <span class="status work"><span class="dt"></span>Plano em andamento</span>
+      </span>
+      <i class="ti ti-chevron-down chev"></i>
+    </div>
+    <div class="abody"><div class="abody-in">
+      <div class="divider"></div>
+      <div class="metrics">
+        <div class="metric"><div class="k">Sobra planejada / mês</div><div class="v fin" id="mSobra">—</div></div>
+        <div class="metric"><div class="k">Pra virar o jogo</div><div class="v fin" id="mMeses">—</div></div>
+        <div class="metric"><div class="k">Dívida a quitar</div><div class="v fin" id="mDivida">—</div></div>
+      </div>
+      <div class="note"><i class="ti ti-bulb" style="color:var(--fin)"></i> O custo de viver cabe na renda — o aperto é a bola de neve dos cartões e empréstimos. Com o plano, vira em poucos meses.</div>
+      <p class="feat">O que esta área vai ter:</p>
+      <div class="feat"><ul>
+        <li><i class="ti ti-receipt"></i> Contas fixas e parcelas</li>
+        <li><i class="ti ti-credit-card"></i> Gastos por cartão</li>
+        <li><i class="ti ti-target"></i> Metas por categoria</li>
+        <li><i class="ti ti-chart-pie"></i> Relatórios em gráficos</li>
+        <li><i class="ti ti-stairs-up"></i> Plano pra quitar dívidas</li>
+        <li><i class="ti ti-user-shield"></i> Gastos pessoais privados</li>
+      </ul></div>
+      <a class="open-btn" href="financas.html"><i class="ti ti-arrow-right"></i> Abrir finanças</a>
+    </div></div>
+  </div>
+
+  <div class="foot">Sah &amp; Dan · sistema da casa<br>Números de finanças vindos da planilha atual</div>
+</div>
+
+<script>
+const TASKS = [
+  {day:"Segunda", label:"Roupa clara na lava e seca", who:"sam"},
+  {day:"Terça", label:"Banheiro — passada rápida", who:"sam"},
+  {day:"Quarta", label:"Roupa escura na lava e seca", who:"sam"},
+  {day:"Quarta", label:"Passar pano — sala + cozinha", who:"dan"},
+  {day:"Sexta", label:"Tirar pó + organizar os quartos", who:"sam"},
+  {day:"Sexta", label:"Faxina pesada do banheiro", who:"dan"},
+  {day:"Sábado", label:"Faxina da cozinha", who:"sam"},
+  {day:"Sábado", label:"Passar pano — casa toda", who:"jun"},
+  {day:"Sábado", label:"Cama + toalhas + dobrar a roupa", who:"dan"},
+  {day:"Domingo", label:"Batch cooking + compras", who:"jun"},
+];
+const DAYS=["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
+const MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const WHO={sam:"Samara",dan:"Daniel",jun:"Juntos"};
+const BRL=n=>"R$ "+n.toLocaleString("pt-BR",{maximumFractionDigits:0});
+
+const now=new Date();
+const h=now.getHours();
+document.getElementById("hello").textContent = h<5?"Boa madrugada":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
+const wd=DAYS[(now.getDay()+6)%7];
+document.getElementById("weekday").textContent=wd;
+document.getElementById("subdate").textContent=`Hoje é ${wd.toLowerCase()}, ${now.getDate()} de ${MES[now.getMonth()]}`;
+
+const todays=TASKS.filter(t=>t.day===wd);
+document.getElementById("orgStatus").textContent = todays.length?`${todays.length} tarefa${todays.length>1?"s":""} hoje`:"Dia leve hoje";
+document.getElementById("todayLabel").textContent = todays.length?`Pra hoje (${wd.toLowerCase()}):`:`Nada agendado pra ${wd.toLowerCase()} — dia de respiro.`;
+const tl=document.getElementById("todayTasks");
+if(todays.length){
+  tl.innerHTML=todays.map(t=>`<div class="titem ${t.who}"><span class="d"></span><span>${t.label}</span><span class="who">${WHO[t.who]}</span></div>`).join("");
+}else{ tl.innerHTML=`<div class="empty">Aproveita o dia livre 🌿</div>`; }
+
+document.getElementById("mSobra").textContent=BRL(2353);
+document.getElementById("mMeses").textContent="~6 meses";
+document.getElementById("mDivida").textContent=BRL(35620);
+
+document.querySelectorAll(".ahead").forEach(h=>{
+  h.addEventListener("click",()=>document.getElementById(h.dataset.toggle).classList.toggle("open"));
+});
+document.getElementById("cardOrg").classList.add("open");
+</script>
