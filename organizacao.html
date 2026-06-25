@@ -253,7 +253,10 @@ function fbLogin(authMod,auth){
 async function loadData(){
   try{
     if(store.mode==="fb"){
-      try{ const s=await store.fb.fs.getDoc(store.fb.ref); if(s.exists()) return normalize(s.data().d); }
+      try{
+        const s=await store.fb.fs.getDoc(store.fb.ref); if(s.exists()) return normalize(s.data().d);
+        const r=localStorage.getItem("casa_org"); if(r){ store.fresh=true; return normalize(JSON.parse(r)); } // migra local -> nuvem
+      }
       catch(e){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); throw e; }
     }
     else if(store.mode==="local"){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); }
