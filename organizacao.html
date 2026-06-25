@@ -219,7 +219,7 @@ const FIREBASE_CONFIG = {
 const FB_DOC = "casa/organizacao";
 
 /* ====== persistência: Firebase -> localStorage -> memória ====== */
-let store={mode:"mem",mem:null,fb:null,fresh:false};
+let store={mode:"mem",mem:null,fb:null,fresh:false,degraded:false};
 async function initStore(){
   if(FIREBASE_CONFIG){
     try{
@@ -259,30 +259,47 @@ function fbLogin(authMod,auth){
   });
 }
 async function loadData(){
-  try{
-    if(store.mode==="fb"){
-      try{
-        const s=await store.fb.fs.getDoc(store.fb.ref); if(s.exists()) return normalize(s.data().d);
-        const r=localStorage.getItem("casa_org"); if(r){ store.fresh=true; return normalize(JSON.parse(r)); } // migra local -> nuvem
-      }
-      catch(e){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); throw e; }
+  if(store.mode==="fb"){
+    try{
+      const s=await store.fb.fs.getDoc(store.fb.ref);
+      if(s.exists()) return normalize(s.data().d);               // nuvem confirmada
+      const r=localStorage.getItem("casa_org");
+      if(r){ store.fresh=true; return normalize(JSON.parse(r)); }// doc NÃO existe -> migra local p/ nuvem
+      store.fresh=true; return seed();                           // 1º uso real -> semeia
+    }catch(e){
+      console.warn("getDoc falhou; modo offline/somente-leitura",e);
+      store.degraded=true;                                       // não confirmou a nuvem: NUNCA gravar por cima
+      const r=localStorage.getItem("casa_org");
+      return r ? normalize(JSON.parse(r)) : seed();
     }
-    else if(store.mode==="local"){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); }
-    else if(store.mem) return normalize(store.mem);
-  }catch(e){ console.warn(e); }
+  }
+  if(store.mode==="local"){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); store.fresh=true; return seed(); }
+  if(store.mem) return normalize(store.mem);
   store.fresh=true; return seed();
 }
-let saveT=null;
-function save(){
-  clearTimeout(saveT);
-  saveT=setTimeout(async()=>{
-    try{
-      if(store.mode==="fb"){ try{localStorage.setItem("casa_org",JSON.stringify(D));}catch(_){} await store.fb.fs.setDoc(store.fb.ref,{d:D}); }
-      else if(store.mode==="local"){ localStorage.setItem("casa_org",JSON.stringify(D)); }
-      else { store.mem=JSON.parse(JSON.stringify(D)); }
-    }catch(e){ console.warn("save",e); }
-  },250);
+function setSync(state){
+  const dot=document.getElementById("modeDot"), txt=document.getElementById("modeTxt"); if(!dot||!txt) return;
+  const m={ ok:["sincronizado","var(--green)"], offline:["offline — não sincronizado","var(--red)"],
+            err:["erro ao salvar — tentando","var(--red)"], local:["salvo neste aparelho","var(--accent-dot)"],
+            mem:["só nesta sessão","var(--muted)"] };
+  const v=m[state]||m.mem; txt.textContent=v[0]; dot.style.background=v[1];
 }
+let saveT=null;
+async function flushSave(){
+  clearTimeout(saveT); saveT=null;
+  try{
+    if(store.mode==="fb"){
+      try{localStorage.setItem("casa_org",JSON.stringify(D));}catch(_){}
+      if(store.degraded){ setSync("offline"); return; }         // não sobrescreve a nuvem sem ter lido ela
+      await store.fb.fs.setDoc(store.fb.ref,{d:D}); setSync("ok");
+    }
+    else if(store.mode==="local"){ localStorage.setItem("casa_org",JSON.stringify(D)); }
+    else { store.mem=JSON.parse(JSON.stringify(D)); }
+  }catch(e){ console.warn("save",e); setSync("err"); }
+}
+function save(){ clearTimeout(saveT); saveT=setTimeout(flushSave,250); }
+addEventListener("pagehide",()=>{ if(saveT) flushSave(); });
+document.addEventListener("visibilitychange",()=>{ if(document.hidden && saveT) flushSave(); });
 function normalize(d){
   d.people=d.people||[]; d.chores=d.chores||[]; d.log=d.log||[];
   const ids=new Set(d.people.map(p=>p.id));
@@ -523,10 +540,7 @@ function renderDesempenho(){
   await initStore();
   D=await loadData();
   if(store.fresh) save(); // fixa o seed no 1º acesso
-  const dot=document.getElementById("modeDot"), txt=document.getElementById("modeTxt");
-  if(store.mode==="fb"){ txt.textContent="sincronizado"; dot.style.background="var(--accent-dot)"; }
-  else if(store.mode==="local"){ txt.textContent="salvo neste aparelho"; dot.style.background="var(--accent-dot)"; }
-  else { txt.textContent="só nesta sessão"; dot.style.background="var(--muted)"; }
+  setSync(store.mode==="fb" ? (store.degraded?"offline":"ok") : store.mode==="local" ? "local" : "mem");
   buildTabs(); selectTab("semana");
 })();
 </script>

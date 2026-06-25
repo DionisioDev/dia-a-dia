@@ -258,7 +258,7 @@ const SEED = {
 };
 
 /* ---------- persistência em camadas ---------- */
-let store={mode:"mem",mem:null,fb:null,fresh:false};
+let store={mode:"mem",mem:null,fb:null,fresh:false,degraded:false};
 async function initStore(){
   if(FIREBASE_CONFIG){
     try{
@@ -298,30 +298,47 @@ function fbLogin(authMod,auth){
   });
 }
 async function loadData(){
-  try{
-    if(store.mode==="fb"){
-      try{
-        const s=await store.fb.fs.getDoc(store.fb.ref); if(s.exists()) return s.data().d;
-        const r=localStorage.getItem("casa_fin"); if(r){ store.fresh=true; return JSON.parse(r); } // migra local -> nuvem
-      }
-      catch(e){ const r=localStorage.getItem("casa_fin"); if(r) return JSON.parse(r); throw e; }
+  if(store.mode==="fb"){
+    try{
+      const s=await store.fb.fs.getDoc(store.fb.ref);
+      if(s.exists()) return s.data().d;                          // nuvem confirmada
+      const r=localStorage.getItem("casa_fin");
+      if(r){ store.fresh=true; return JSON.parse(r); }           // doc NÃO existe -> migra local p/ nuvem
+      store.fresh=true; return JSON.parse(JSON.stringify(SEED)); // 1º uso real -> semeia
+    }catch(e){
+      console.warn("getDoc falhou; modo offline/somente-leitura",e);
+      store.degraded=true;                                       // não confirmou a nuvem: NUNCA gravar por cima
+      const r=localStorage.getItem("casa_fin");
+      return r ? JSON.parse(r) : JSON.parse(JSON.stringify(SEED));
     }
-    else if(store.mode==="local"){ const r=localStorage.getItem("casa_fin"); if(r) return JSON.parse(r); }
-    else if(store.mem) return store.mem;
-  }catch(e){ console.warn(e); }
+  }
+  if(store.mode==="local"){ const r=localStorage.getItem("casa_fin"); if(r) return JSON.parse(r); store.fresh=true; return JSON.parse(JSON.stringify(SEED)); }
+  if(store.mem) return store.mem;
   store.fresh=true; return JSON.parse(JSON.stringify(SEED));
 }
-let saveT=null;
-function saveData(){
-  clearTimeout(saveT);
-  saveT=setTimeout(async()=>{
-    try{
-      if(store.mode==="fb"){ try{localStorage.setItem("casa_fin",JSON.stringify(D));}catch(_){} await store.fb.fs.setDoc(store.fb.ref,{d:D}); }
-      else if(store.mode==="local"){ localStorage.setItem("casa_fin",JSON.stringify(D)); }
-      else { store.mem=JSON.parse(JSON.stringify(D)); }
-    }catch(e){ console.warn("save",e); }
-  },300);
+function setSync(state){
+  const dot=document.getElementById("modeDot"), txt=document.getElementById("modeTxt"); if(!dot||!txt) return;
+  const m={ ok:["sincronizado","var(--green)"], offline:["offline — não sincronizado","var(--red)"],
+            err:["erro ao salvar — tentando","var(--red)"], local:["salvo neste aparelho","var(--fin)"],
+            mem:["só nesta sessão","var(--muted)"] };
+  const v=m[state]||m.mem; txt.textContent=v[0]; dot.style.background=v[1];
 }
+let saveT=null;
+async function flushSave(){
+  clearTimeout(saveT); saveT=null;
+  try{
+    if(store.mode==="fb"){
+      try{localStorage.setItem("casa_fin",JSON.stringify(D));}catch(_){}
+      if(store.degraded){ setSync("offline"); return; }         // não sobrescreve a nuvem sem ter lido ela
+      await store.fb.fs.setDoc(store.fb.ref,{d:D}); setSync("ok");
+    }
+    else if(store.mode==="local"){ localStorage.setItem("casa_fin",JSON.stringify(D)); }
+    else { store.mem=JSON.parse(JSON.stringify(D)); }
+  }catch(e){ console.warn("save",e); setSync("err"); }
+}
+function saveData(){ clearTimeout(saveT); saveT=setTimeout(flushSave,300); }
+addEventListener("pagehide",()=>{ if(saveT) flushSave(); });
+document.addEventListener("visibilitychange",()=>{ if(document.hidden && saveT) flushSave(); });
 
 /* ---------- estado + cálculos ---------- */
 let D=null, charts={}, personView="Sah";
@@ -569,10 +586,7 @@ function renderPessoal(){
   await initStore();
   D=await loadData();
   if(store.fresh) saveData();
-  const dot=document.getElementById("modeDot"), txt=document.getElementById("modeTxt");
-  if(store.mode==="fb"){txt.textContent="sincronizado";dot.style.background="var(--green)";}
-  else if(store.mode==="local"){txt.textContent="salvo neste aparelho";dot.style.background="var(--fin)";}
-  else{txt.textContent="só nesta sessão";dot.style.background="var(--muted)";}
+  setSync(store.mode==="fb" ? (store.degraded?"offline":"ok") : store.mode==="local" ? "local" : "mem");
   if(window.Chart){const _cs=getComputedStyle(document.documentElement);
     Chart.defaults.color=_cs.getPropertyValue("--muted").trim()||"#73603F";Chart.defaults.font.family="Inter";
     Chart.defaults.borderColor=_cs.getPropertyValue("--line").trim()||"#E2D8BC";
