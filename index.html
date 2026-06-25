@@ -27,7 +27,7 @@
     --fin:#835033; --fin-bg:#EDE3D6; --fin-ink:#5A352A;
     --disp:"Bricolage Grotesque", system-ui, sans-serif;
     --body:"Inter", system-ui, sans-serif;
-    --sh:0 6px 18px rgba(90,53,42,.10);
+    --sh:0 4px 16px rgba(90,53,42,.08);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{-webkit-text-size-adjust:100%}
@@ -73,15 +73,15 @@
   .choice{position:relative;display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;
     background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--sh);
     overflow:hidden;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
-  .choice::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:4px;border-radius:0 4px 4px 0}
+  .choice::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;z-index:1}
   .choice.org::before{background:var(--org)} .choice.fin::before{background:var(--fin)}
-  .choice .num{position:absolute;right:14px;bottom:-12px;font-family:var(--disp);font-weight:700;
-    font-size:84px;line-height:1;letter-spacing:-.04em;opacity:.05;pointer-events:none}
-  .tile{flex:0 0 auto;width:58px;height:58px;border-radius:17px;display:flex;align-items:center;
-    justify-content:center;font-size:30px;transition:transform .18s ease}
+  .choice .num{position:absolute;right:16px;bottom:-8px;font-family:var(--disp);font-weight:700;
+    font-size:74px;line-height:1;letter-spacing:-.04em;opacity:.045;pointer-events:none;z-index:0}
+  .tile{flex:0 0 auto;width:52px;height:52px;border-radius:16px;display:flex;align-items:center;
+    justify-content:center;font-size:26px;position:relative;z-index:1;transition:transform .18s ease}
   .choice.org .tile{background:var(--org-bg);color:var(--org-ink)}
   .choice.fin .tile{background:var(--fin-bg);color:var(--fin-ink)}
-  .body{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+  .body{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;position:relative;z-index:1}
   .body .ck{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
   .choice.org .body .ck{color:var(--org)} .choice.fin .body .ck{color:var(--fin)}
   .body h2{font-family:var(--disp);font-weight:600;font-size:21px;letter-spacing:-.01em;margin:3px 0 0;line-height:1.15}
@@ -91,8 +91,8 @@
   .choice.org .chip{background:var(--org-bg);color:var(--org-ink)}
   .choice.fin .chip{background:var(--fin-bg);color:var(--fin-ink)}
   .chip .dt{width:6px;height:6px;border-radius:50%;background:currentColor}
-  .go{flex:0 0 auto;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--muted);
+  .go{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);position:relative;z-index:1;
+    display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);
     transition:background .18s ease,color .18s ease,border-color .18s ease}
   .go .ms{transition:transform .18s ease}
 
