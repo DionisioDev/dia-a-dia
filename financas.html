@@ -27,6 +27,7 @@
     --fin:#835033; --fin-bg:#EDE3D6; --fin-ink:#5A352A;
     --red:#A33B20; --red-bg:#F5E2D7; --green:#5B7553; --green-bg:#E7ECDF;
     --disp:"Bricolage Grotesque",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
+    --sh:0 2px 10px rgba(90,53,42,.05);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   .ms{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;font-size:inherit;
@@ -61,10 +62,10 @@
   section{display:none} section.active{display:block}
   .h{font-family:var(--disp);font-weight:600;font-size:16px;margin:22px 2px 10px;display:flex;align-items:center;gap:8px}
   .h:first-child{margin-top:8px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
   /* KPIs */
   .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 15px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 15px;box-shadow:var(--sh)}
   .kpi .k{font-size:12px;color:var(--muted);font-weight:500}
   .kpi .v{font-family:var(--disp);font-weight:700;font-size:23px;margin-top:5px;letter-spacing:-.01em}
   .kpi .v.neg{color:var(--red)} .kpi .v.pos{color:var(--green)} .kpi .v.fin{color:var(--fin-ink)}

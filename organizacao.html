@@ -24,6 +24,7 @@
     --done:#7E7252;
     --disp:"Bricolage Grotesque", system-ui, sans-serif;
     --body:"Inter", system-ui, sans-serif;
+    --sh:0 2px 10px rgba(90,53,42,.05);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5;
@@ -41,7 +42,7 @@
   .back:active{transform:scale(.96)}
   /* progress */
   .top{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);
-    border-radius:20px;padding:18px 20px;margin:18px 0 8px}
+    border-radius:20px;padding:18px 20px;margin:18px 0 8px;box-shadow:var(--sh)}
   .ring{flex:0 0 auto;position:relative;width:84px;height:84px}
   .ring svg{transform:rotate(-90deg)}
   .ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
@@ -60,7 +61,7 @@
   .dayhead h3{font-family:var(--disp);font-weight:600;font-size:15px;margin:0;letter-spacing:.01em}
   .today{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--ink);
     border-radius:999px;padding:3px 8px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--sh)}
   .task{display:flex;align-items:center;gap:13px;padding:14px 16px;cursor:pointer;border-top:1px solid var(--line);
     min-height:56px;transition:background .12s}
   .task:first-child{border-top:0}
@@ -80,7 +81,7 @@
   .task.done .label{color:var(--done);text-decoration:line-through;text-decoration-color:var(--done)}
   .task.done .who{opacity:.45}
   /* occasional */
-  .occ{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .occ{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--sh)}
   .occ .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .occ h3{font-family:var(--disp);font-weight:600;font-size:15px;margin:0}
   .occ .meta{font-size:13px;color:var(--muted);margin:4px 0 0}

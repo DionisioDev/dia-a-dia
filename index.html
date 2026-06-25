@@ -27,6 +27,7 @@
     --fin:#835033; --fin-bg:#EDE3D6; --fin-ink:#5A352A;
     --disp:"Bricolage Grotesque", system-ui, sans-serif;
     --body:"Inter", system-ui, sans-serif;
+    --sh:0 6px 18px rgba(90,53,42,.10);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{-webkit-text-size-adjust:100%}
@@ -70,8 +71,8 @@
   /* as duas "portas" */
   .choices{display:flex;flex-direction:column;gap:14px}
   .choice{position:relative;display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;
-    background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;
-    overflow:hidden;transition:transform .18s ease,border-color .18s ease}
+    background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--sh);
+    overflow:hidden;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
   .choice::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:4px;border-radius:0 4px 4px 0}
   .choice.org::before{background:var(--org)} .choice.fin::before{background:var(--fin)}
   .choice .num{position:absolute;right:14px;bottom:-12px;font-family:var(--disp);font-weight:700;
@@ -97,7 +98,7 @@
 
   /* interação (desktop hover + toque) */
   @media (hover:hover){
-    .choice:hover{transform:translateY(-3px)}
+    .choice:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(90,53,42,.16)}
     .choice.org:hover{border-color:var(--org)} .choice.fin:hover{border-color:var(--fin)}
     .choice:hover .tile{transform:scale(1.05)}
     .choice.org:hover .go{background:var(--org);border-color:var(--org);color:#fff}
