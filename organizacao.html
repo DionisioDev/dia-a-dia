@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Casa — Samara &amp; Daniel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,11 +27,14 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5;
-    padding:20px 16px 56px;display:flex;justify-content:center}
+    padding:0 max(16px,env(safe-area-inset-right))
+            calc(56px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+    display:flex;justify-content:center}
   .wrap{width:100%;max-width:560px}
   .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0}
   h1{font-family:var(--disp);font-weight:700;font-size:34px;letter-spacing:-.02em;margin:2px 0 0}
-  .toprow{display:flex;align-items:center;gap:12px}
+  .toprow{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;background:var(--paper);
+    padding-top:max(14px,env(safe-area-inset-top));padding-bottom:10px}
   .back{flex:0 0 auto;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);
     display:flex;align-items:center;justify-content:center;color:var(--ink);text-decoration:none}
   .back svg{width:20px;height:20px}

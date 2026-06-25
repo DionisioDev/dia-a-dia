@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Finanças — Sah &amp; Dan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,30 +34,37 @@
     word-wrap:normal;direction:ltr;vertical-align:middle;-webkit-font-smoothing:antialiased;
     font-feature-settings:"liga";font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5}
-  .app{max-width:620px;margin:0 auto;padding:0 0 80px}
+  .app{max-width:620px;margin:0 auto;padding:0 0 calc(98px + env(safe-area-inset-bottom))}
   /* top bar */
-  .top{position:sticky;top:0;z-index:20;background:var(--paper);padding:16px 16px 0}
+  .top{position:sticky;top:0;z-index:20;background:var(--paper);
+    padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left))}
   .toprow{display:flex;align-items:center;gap:10px}
   .back{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
     display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:17px;text-decoration:none}
   .toprow h1{font-family:var(--disp);font-weight:700;font-size:21px;margin:0;letter-spacing:-.01em}
   .toprow .mode{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:5px}
   .toprow .mode .dt{width:7px;height:7px;border-radius:50%;background:var(--muted)}
-  .tabs{display:flex;gap:6px;overflow-x:auto;padding:14px 0 12px;scrollbar-width:none}
-  .tabs::-webkit-scrollbar{display:none}
-  .tab{flex:0 0 auto;font-size:13px;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--muted);
-    border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
-  .tab .ms{font-size:15px}
-  .tab[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  /* menu inferior flutuante e arredondado (estilo Nubank) */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;
+    padding:0 12px calc(12px + env(safe-area-inset-bottom));pointer-events:none}
+  .tabbar-inner{display:flex;width:100%;max-width:460px;background:var(--surface);border:1px solid var(--line);
+    border-radius:26px;box-shadow:0 8px 26px rgba(90,53,42,.16);padding:7px 8px;gap:2px;pointer-events:auto}
+  .tab{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;
+    color:var(--muted);font-family:var(--body);font-size:10px;font-weight:600;padding:7px 2px;border-radius:17px;
+    cursor:pointer;transition:color .15s,background .15s}
+  .tab .ms{font-size:23px}
+  .tab .lbl{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tab[aria-selected="true"]{color:var(--fin-ink);background:var(--fin-bg)}
+  .tab[aria-selected="true"] .ms{font-variation-settings:"FILL" 1,"wght" 500,"GRAD" 0,"opsz" 24}
   /* content */
   .content{padding:6px 16px 0}
   section{display:none} section.active{display:block}
   .h{font-family:var(--disp);font-weight:600;font-size:16px;margin:22px 2px 10px;display:flex;align-items:center;gap:8px}
   .h:first-child{margin-top:8px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
   /* KPIs */
   .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 15px}
   .kpi .k{font-size:12px;color:var(--muted);font-weight:500}
   .kpi .v{font-family:var(--disp);font-weight:700;font-size:23px;margin-top:5px;letter-spacing:-.01em}
   .kpi .v.neg{color:var(--red)} .kpi .v.pos{color:var(--green)} .kpi .v.fin{color:var(--fin-ink)}
@@ -129,7 +136,6 @@
       <h1>Finanças</h1>
       <span class="mode"><span class="dt" id="modeDot"></span><span id="modeTxt">…</span></span>
     </div>
-    <div class="tabs" id="tabs" role="tablist"></div>
   </div>
 
   <div class="content">
@@ -141,6 +147,8 @@
     <section id="t-pessoal"></section>
   </div>
 </div>
+
+<nav class="tabbar" aria-label="Seções"><div class="tabbar-inner" id="tabs" role="tablist"></div></nav>
 
 <script>
 /* ============ FIREBASE (opcional) ============
@@ -285,19 +293,18 @@ const TABDEF=[
   {id:"lanc",label:"Lançamentos",icon:"list_alt"},
   {id:"cartoes",label:"Cartões",icon:"credit_card"},
   {id:"metas",label:"Metas",icon:"target"},
-  {id:"dividas",label:"Dívidas & plano",icon:"stairs"},
+  {id:"dividas",label:"Dívidas",icon:"stairs"},
   {id:"pessoal",label:"Pessoal",icon:"shield_person"},
 ];
 function buildTabs(){
   document.getElementById("tabs").innerHTML=TABDEF.map((t,i)=>
-    `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${i===0}"><span class="ms" aria-hidden="true">${t.icon}</span>${t.label}</button>`).join("");
+    `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${i===0}"><span class="ms" aria-hidden="true">${t.icon}</span><span class="lbl">${t.label}</span></button>`).join("");
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>selectTab(b.dataset.tab)));
 }
 function selectTab(id){
   document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===id));
   document.querySelectorAll("section").forEach(s=>s.classList.toggle("active",s.id==="t-"+id));
   renderTab(id);
-  document.querySelector(`.tab[data-tab="${id}"]`).scrollIntoView({inline:"center",block:"nearest"});
 }
 function renderTab(id){ ({geral:renderGeral,lanc:renderLanc,cartoes:renderCartoes,metas:renderMetas,dividas:renderDividas,pessoal:renderPessoal}[id])(); }
 
