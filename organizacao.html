@@ -161,6 +161,13 @@
 <nav class="tabbar" aria-label="Seções"><div class="tabbar-inner" id="tabs" role="tablist"></div></nav>
 
 <script>
+/* ====== TEMAS / PALETAS (escolhidos na tela inicial) ====== */
+const THEME_BASE={"--paper":"#F8F4E3","--surface":"#FEFCF7","--ink":"#5A352A","--muted":"#73603F","--line":"#E2D8BC","--soft":"#F1EAD2","--sam":"#3F5238","--sam-bg":"#E7ECDF","--sam-dot":"#5B7553","--dan":"#5A352A","--dan-bg":"#EDE3D6","--dan-dot":"#835033","--jun":"#7A2E18","--jun-bg":"#F5E2D7","--jun-dot":"#A33B20","--org":"#5B7553","--org-bg":"#E7ECDF","--org-ink":"#3F5238","--fin":"#835033","--fin-bg":"#EDE3D6","--fin-ink":"#5A352A","--red":"#A33B20","--red-bg":"#F5E2D7","--green":"#5B7553","--green-bg":"#E7ECDF","--accent":"#4F6648","--accent-bg":"#E7ECDF","--accent-dot":"#5B7553","--done":"#7E7252"};
+const THEMES={terroso:{},viva:{"--paper":"#FBF3DD","--surface":"#FFFFFF","--ink":"#43291F","--muted":"#7A6743","--line":"#EAD9AE","--soft":"#F6ECCF","--sam":"#3E6B2E","--sam-bg":"#E3EFD6","--sam-dot":"#5E9A3E","--dan":"#7A3E1C","--dan-bg":"#F4E2CE","--dan-dot":"#B5642B","--jun":"#9A2E12","--jun-bg":"#FBDDCB","--jun-dot":"#D43E18","--org":"#5E9A3E","--org-bg":"#E3EFD6","--org-ink":"#33611F","--fin":"#B5642B","--fin-bg":"#F4E2CE","--fin-ink":"#7A3E1C","--red":"#D43E18","--red-bg":"#FBDDCB","--green":"#5E9A3E","--green-bg":"#E3EFD6","--accent":"#4E8233","--accent-bg":"#E3EFD6","--accent-dot":"#5E9A3E","--done":"#9A8A5E"},clara:{"--paper":"#FAF7EF","--surface":"#FFFFFF","--ink":"#4E4034","--muted":"#857754","--line":"#ECE6D6","--soft":"#F4F0E4"},escura:{"--paper":"#1E1712","--surface":"#2A211B","--ink":"#F2E8D7","--muted":"#B6A789","--line":"#3A2E25","--soft":"#2E251E","--sam":"#9CB98A","--sam-bg":"#2A3322","--sam-dot":"#86A86F","--dan":"#D9A77E","--dan-bg":"#33271F","--dan-dot":"#C08A60","--jun":"#E08A6B","--jun-bg":"#3A271F","--jun-dot":"#CF6B45","--org":"#86A86F","--org-bg":"#2A3322","--org-ink":"#9CB98A","--fin":"#E6C7A8","--fin-bg":"#33271F","--fin-ink":"#E6C7A8","--red":"#E07A55","--red-bg":"#3A271F","--green":"#86A86F","--green-bg":"#2A3322","--accent":"#9CB98A","--accent-bg":"#2A3322","--accent-dot":"#86A86F","--done":"#8A7F63"}};
+function applyTheme(id){ const m=Object.assign({},THEME_BASE,THEMES[id]||{}); const s=document.documentElement.style; for(const k in m) s.setProperty(k,m[k]); }
+function currentTheme(){ try{ return localStorage.getItem("casa_theme")||"terroso"; }catch(e){ return "terroso"; } }
+applyTheme(currentTheme());
+
 /* ====== util ====== */
 const uid = () => Math.random().toString(36).slice(2,9);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));

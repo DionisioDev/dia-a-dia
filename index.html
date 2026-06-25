@@ -6,8 +6,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<!-- Ícones: Material Symbols Outlined. Ao usar um ícone novo, adicione o nome em icon_names abaixo. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward,cleaning_services,home,savings&display=block">
+<!-- Ícones: Material Symbols Outlined. Ao usar um ícone novo, adicione o nome em icon_names. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward,check,cleaning_services,home,savings&display=block">
 <!-- PWA: app instalável no celular -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#F8F4E3">
@@ -25,50 +25,60 @@
     --jun-bg:#F5E2D7; --jun:#7A2E18; --jun-dot:#A33B20;
     --org:#5B7553; --org-bg:#E7ECDF; --org-ink:#3F5238;
     --fin:#835033; --fin-bg:#EDE3D6; --fin-ink:#5A352A;
+    --accent:#4F6648; --accent-bg:#E7ECDF; --accent-dot:#5B7553;
     --disp:"Bricolage Grotesque", system-ui, sans-serif;
     --body:"Inter", system-ui, sans-serif;
     --sh:0 4px 16px rgba(90,53,42,.08);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{-webkit-text-size-adjust:100%}
+  [hidden]{display:none!important}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5;
     min-height:100dvh;display:flex;justify-content:center;
-    padding:max(26px,env(safe-area-inset-top)) 18px calc(46px + env(safe-area-inset-bottom));
-    overflow-x:hidden}
-  /* textura de papel — estática, plana, bem sutil */
+    padding:max(26px,env(safe-area-inset-top)) 18px calc(46px + env(safe-area-inset-bottom));overflow-x:hidden}
   body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-  /* ícone */
   .ms{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;font-size:inherit;
     line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;
     word-wrap:normal;direction:ltr;vertical-align:middle;-webkit-font-smoothing:antialiased;
     font-feature-settings:"liga";font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24}
 
-  .wrap{width:100%;max-width:600px;position:relative;z-index:1}
+  /* ===== tela de login dedicada ===== */
+  .login{position:fixed;inset:0;z-index:200;background:var(--paper);display:flex;align-items:center;justify-content:center;
+    padding:max(28px,env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom))}
+  .login-in{width:100%;max-width:330px;display:flex;flex-direction:column;align-items:center;text-align:center;
+    animation:rise .55s ease-out both}
+  .logo{width:76px;height:76px;border-radius:23px;background:var(--ink);color:var(--paper);
+    display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:var(--sh)}
+  .logo-name{font-family:var(--disp);font-weight:700;font-size:36px;letter-spacing:-.025em;margin:18px 0 0}
+  .tag{margin:8px 0 24px;color:var(--muted);font-size:15px;text-wrap:balance;max-width:26ch}
+  #loginForm{width:100%;display:flex;flex-direction:column;gap:11px}
+  #loginForm input{font-family:var(--body);font-size:15px;width:100%;padding:14px 15px;border:1px solid var(--line);
+    border-radius:14px;background:var(--surface);color:var(--ink)}
+  #loginForm input:focus{outline:none;border-color:var(--muted)}
+  .btn-primary{font-family:var(--body);font-weight:600;font-size:15px;border:0;border-radius:14px;padding:14px;
+    background:var(--ink);color:var(--paper);cursor:pointer;transition:transform .12s}
+  .btn-primary:active{transform:scale(.99)}
+  .lerr{color:var(--jun);font-size:13px;min-height:18px}
+  .login-foot{margin-top:22px;color:var(--muted);font-size:12px}
 
-  /* topo / marca */
+  /* ===== home ===== */
+  .wrap{width:100%;max-width:600px;position:relative;z-index:1}
   .brand{display:flex;align-items:center;gap:11px}
   .brand .mark{width:34px;height:34px;border-radius:11px;background:var(--ink);color:var(--paper);
     display:flex;align-items:center;justify-content:center;font-size:20px}
   .brand b{font-family:var(--disp);font-weight:600;font-size:16px;letter-spacing:.01em}
-  .brand .tag{margin-left:auto;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-    font-weight:600;color:var(--muted)}
-
-  /* herói / saudação */
+  .brand .tag2{margin-left:auto;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--muted)}
   .hero{margin:34px 2px 6px}
   .kick{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600}
   .hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(34px,11vw,46px);letter-spacing:-.025em;
     line-height:1.02;margin:12px 0 0;text-wrap:balance}
   .hero .sub{margin:12px 0 0;color:var(--muted);font-size:14.5px;text-wrap:pretty;max-width:34ch}
   .hero .sub b{color:var(--ink);font-weight:600}
-
-  /* rótulo de seção */
   .seclabel{display:flex;align-items:center;gap:12px;margin:34px 2px 16px;
     font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
   .seclabel::after{content:"";flex:1;height:1px;background:var(--line)}
-
-  /* as duas "portas" */
   .choices{display:flex;flex-direction:column;gap:14px}
   .choice{position:relative;display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;
     background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--sh);
@@ -86,8 +96,7 @@
   .choice.org .body .ck{color:var(--org)} .choice.fin .body .ck{color:var(--fin)}
   .body h2{font-family:var(--disp);font-weight:600;font-size:21px;letter-spacing:-.01em;margin:3px 0 0;line-height:1.15}
   .body .desc{margin:3px 0 0;color:var(--muted);font-size:13px}
-  .chip{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:11.5px;font-weight:600;
-    padding:4px 10px;border-radius:999px}
+  .chip{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px}
   .choice.org .chip{background:var(--org-bg);color:var(--org-ink)}
   .choice.fin .chip{background:var(--fin-bg);color:var(--fin-ink)}
   .chip .dt{width:6px;height:6px;border-radius:50%;background:currentColor}
@@ -95,8 +104,6 @@
     display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);
     transition:background .18s ease,color .18s ease,border-color .18s ease}
   .go .ms{transition:transform .18s ease}
-
-  /* interação (desktop hover + toque) */
   @media (hover:hover){
     .choice:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(90,53,42,.16)}
     .choice.org:hover{border-color:var(--org)} .choice.fin:hover{border-color:var(--fin)}
@@ -107,23 +114,48 @@
   }
   .choice:active{transform:translateY(-1px) scale(.992)}
 
+  /* ===== seletor de tema ===== */
+  .themes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .theme{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);
+    border-radius:16px;padding:11px 13px;cursor:pointer;box-shadow:var(--sh);transition:border-color .15s}
+  .theme[aria-pressed="true"]{border-color:var(--ink)}
+  .theme .dots{display:flex;flex:0 0 auto}
+  .theme .dots i{width:17px;height:17px;border-radius:50%;border:2px solid var(--surface);margin-left:-6px}
+  .theme .dots i:first-child{margin-left:0}
+  .theme .tn{font-family:var(--body);font-weight:600;font-size:13.5px;color:var(--ink)}
+  .theme .chk{margin-left:auto;color:var(--ink);font-size:18px;opacity:0}
+  .theme[aria-pressed="true"] .chk{opacity:1}
+
   .foot{margin-top:34px;text-align:center;color:var(--muted);font-size:12px;line-height:1.7}
   .foot .ms{font-size:14px;vertical-align:-.18em;opacity:.7}
 
-  /* entrada em cascata — só transform/opacity */
   @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
   .r{animation:rise .55s ease-out both;animation-delay:var(--d,0s)}
-
-  @media (prefers-reduced-motion:reduce){
-    *,*::before,*::after{animation:none!important;transition:none!important}
-  }
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 
-<div class="wrap">
+<!-- LOGIN (some quando autenticado) -->
+<div class="login" id="login">
+  <div class="login-in">
+    <div class="logo"><span class="ms" aria-hidden="true">home</span></div>
+    <h1 class="logo-name">Casa</h1>
+    <p class="tag">A vida da casa de vocês, organizada num lugar só.</p>
+    <form id="loginForm">
+      <input type="email" id="lEmail" placeholder="E-mail" autocomplete="username">
+      <input type="password" id="lPass" placeholder="Senha" autocomplete="current-password">
+      <div class="lerr" id="lErr"></div>
+      <button type="submit" class="btn-primary" id="lBtn">Entrar</button>
+    </form>
+    <p class="login-foot">Sah &amp; Dan · feito em casa</p>
+  </div>
+</div>
+
+<!-- HOME (revela após login) -->
+<div class="wrap" id="home" hidden>
   <header class="brand r" style="--d:0s">
     <span class="mark"><span class="ms" aria-hidden="true">home</span></span>
     <b>Casa</b>
-    <span class="tag" id="weekday"></span>
+    <span class="tag2" id="weekday"></span>
   </header>
 
   <section class="hero">
@@ -160,30 +192,90 @@
     </a>
   </nav>
 
-  <p class="foot r" style="--d:.48s">Sah &amp; Dan · feito em casa <span class="ms" aria-hidden="true">home</span></p>
+  <div class="seclabel r" style="--d:.44s">Aparência</div>
+  <div class="themes r" id="themes" style="--d:.48s"></div>
+
+  <p class="foot r" style="--d:.56s">Sah &amp; Dan · feito em casa <span class="ms" aria-hidden="true">home</span></p>
 </div>
 
 <script>
-const TASKS = [
-  {day:"Segunda", who:"sam"},{day:"Terça", who:"sam"},{day:"Quarta", who:"sam"},{day:"Quarta", who:"dan"},
-  {day:"Sexta", who:"sam"},{day:"Sexta", who:"dan"},{day:"Sábado", who:"sam"},{day:"Sábado", who:"jun"},
-  {day:"Sábado", who:"dan"},{day:"Domingo", who:"jun"},
-];
+/* ============ FIREBASE (login compartilhado) ============ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBKNGNEci-aGa7oBpChvU5IlnNWtjFiOrk",
+  authDomain: "casa-sah-dan.firebaseapp.com",
+  projectId: "casa-sah-dan",
+  storageBucket: "casa-sah-dan.firebasestorage.app",
+  messagingSenderId: "299406597251",
+  appId: "1:299406597251:web:aa9d1d6f6e8b55cef5cfb6"
+};
+
+/* ============ TEMAS / PALETAS ============ */
+const THEME_BASE={"--paper":"#F8F4E3","--surface":"#FEFCF7","--ink":"#5A352A","--muted":"#73603F","--line":"#E2D8BC","--soft":"#F1EAD2","--sam":"#3F5238","--sam-bg":"#E7ECDF","--sam-dot":"#5B7553","--dan":"#5A352A","--dan-bg":"#EDE3D6","--dan-dot":"#835033","--jun":"#7A2E18","--jun-bg":"#F5E2D7","--jun-dot":"#A33B20","--org":"#5B7553","--org-bg":"#E7ECDF","--org-ink":"#3F5238","--fin":"#835033","--fin-bg":"#EDE3D6","--fin-ink":"#5A352A","--red":"#A33B20","--red-bg":"#F5E2D7","--green":"#5B7553","--green-bg":"#E7ECDF","--accent":"#4F6648","--accent-bg":"#E7ECDF","--accent-dot":"#5B7553","--done":"#7E7252"};
+const THEMES={
+  terroso:{},
+  viva:{"--paper":"#FBF3DD","--surface":"#FFFFFF","--ink":"#43291F","--muted":"#7A6743","--line":"#EAD9AE","--soft":"#F6ECCF","--sam":"#3E6B2E","--sam-bg":"#E3EFD6","--sam-dot":"#5E9A3E","--dan":"#7A3E1C","--dan-bg":"#F4E2CE","--dan-dot":"#B5642B","--jun":"#9A2E12","--jun-bg":"#FBDDCB","--jun-dot":"#D43E18","--org":"#5E9A3E","--org-bg":"#E3EFD6","--org-ink":"#33611F","--fin":"#B5642B","--fin-bg":"#F4E2CE","--fin-ink":"#7A3E1C","--red":"#D43E18","--red-bg":"#FBDDCB","--green":"#5E9A3E","--green-bg":"#E3EFD6","--accent":"#4E8233","--accent-bg":"#E3EFD6","--accent-dot":"#5E9A3E","--done":"#9A8A5E"},
+  clara:{"--paper":"#FAF7EF","--surface":"#FFFFFF","--ink":"#4E4034","--muted":"#857754","--line":"#ECE6D6","--soft":"#F4F0E4"},
+  escura:{"--paper":"#1E1712","--surface":"#2A211B","--ink":"#F2E8D7","--muted":"#B6A789","--line":"#3A2E25","--soft":"#2E251E","--sam":"#9CB98A","--sam-bg":"#2A3322","--sam-dot":"#86A86F","--dan":"#D9A77E","--dan-bg":"#33271F","--dan-dot":"#C08A60","--jun":"#E08A6B","--jun-bg":"#3A271F","--jun-dot":"#CF6B45","--org":"#86A86F","--org-bg":"#2A3322","--org-ink":"#9CB98A","--fin":"#E6C7A8","--fin-bg":"#33271F","--fin-ink":"#E6C7A8","--red":"#E07A55","--red-bg":"#3A271F","--green":"#86A86F","--green-bg":"#2A3322","--accent":"#9CB98A","--accent-bg":"#2A3322","--accent-dot":"#86A86F","--done":"#8A7F63"}
+};
+const THEME_NAMES={terroso:"Terroso",viva:"Viva",clara:"Clara",escura:"Escura"};
+function applyTheme(id){ const m=Object.assign({},THEME_BASE,THEMES[id]||{}); const s=document.documentElement.style; for(const k in m) s.setProperty(k,m[k]); }
+function currentTheme(){ try{ return localStorage.getItem("casa_theme")||"terroso"; }catch(e){ return "terroso"; } }
+applyTheme(currentTheme());
+
+/* ============ saudação ============ */
+const TASKS_DAYS=["Segunda","Terça","Quarta","Quarta","Sexta","Sexta","Sábado","Sábado","Sábado","Domingo"];
 const DAYS=["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
 const MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
-
 const now=new Date(), h=now.getHours();
-const greet = h<5?"Boa madrugada":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
 const wd=DAYS[(now.getDay()+6)%7];
-
-document.getElementById("hello").textContent = greet;
+document.getElementById("hello").textContent = h<5?"Boa madrugada":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
 document.getElementById("weekday").textContent = wd;
-document.getElementById("subline").innerHTML =
-  `Hoje é <b>${wd.toLowerCase()}, ${now.getDate()} de ${MES[now.getMonth()]}</b>. Por onde começamos?`;
+document.getElementById("subline").innerHTML = `Hoje é <b>${wd.toLowerCase()}, ${now.getDate()} de ${MES[now.getMonth()]}</b>. Por onde começamos?`;
+const todays = TASKS_DAYS.filter(d=>d===wd).length;
+document.getElementById("orgStatus").textContent = todays ? `${todays} tarefa${todays>1?"s":""} hoje` : "Dia leve hoje";
 
-const todays = TASKS.filter(t=>t.day===wd).length;
-document.getElementById("orgStatus").textContent =
-  todays ? `${todays} tarefa${todays>1?"s":""} hoje` : "Dia leve hoje";
+/* ============ seletor de tema (UI) ============ */
+const themesEl=document.getElementById("themes");
+function renderThemes(){
+  const cur=currentTheme();
+  themesEl.innerHTML=Object.keys(THEMES).map(id=>{
+    const t=Object.assign({},THEME_BASE,THEMES[id]);
+    return `<button class="theme" data-theme="${id}" aria-pressed="${id===cur}">
+      <span class="dots"><i style="background:${t["--paper"]}"></i><i style="background:${t["--accent-dot"]}"></i><i style="background:${t["--ink"]}"></i></span>
+      <span class="tn">${THEME_NAMES[id]}</span>
+      <span class="chk ms" aria-hidden="true">check</span></button>`;
+  }).join("");
+  themesEl.querySelectorAll("[data-theme]").forEach(b=>b.addEventListener("click",()=>{
+    const id=b.dataset.theme;
+    try{ localStorage.setItem("casa_theme",id); }catch(e){}
+    applyTheme(id); renderThemes();
+  }));
+}
+renderThemes();
+
+/* ============ login gate ============ */
+const loginEl=document.getElementById("login"), homeEl=document.getElementById("home");
+function showHome(){ loginEl.hidden=true; homeEl.hidden=false; }
+(async function(){
+  if(!FIREBASE_CONFIG){ showHome(); return; }
+  try{
+    const appMod=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const authMod=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+    const a=appMod.initializeApp(FIREBASE_CONFIG); const auth=authMod.getAuth(a);
+    const user=await new Promise(r=>{ const off=authMod.onAuthStateChanged(auth,u=>{off();r(u);}); });
+    if(user){ showHome(); return; }
+    const form=document.getElementById("loginForm");
+    form.addEventListener("submit",async ev=>{
+      ev.preventDefault();
+      const btn=document.getElementById("lBtn"), err=document.getElementById("lErr");
+      err.textContent=""; btn.disabled=true; btn.textContent="Entrando…";
+      try{
+        await authMod.signInWithEmailAndPassword(auth, document.getElementById("lEmail").value.trim(), document.getElementById("lPass").value);
+        showHome();
+      }catch(e){ err.textContent="E-mail ou senha incorretos."; btn.disabled=false; btn.textContent="Entrar"; }
+    });
+  }catch(e){ console.warn("auth falhou, abrindo sem login",e); showHome(); }
+})();
 </script>
 <script>
   if ("serviceWorker" in navigator) {
