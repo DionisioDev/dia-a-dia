@@ -133,6 +133,13 @@
   .tab[aria-selected="true"]{color:var(--accent);background:var(--accent-bg)}
   .tab[aria-selected="true"] .ms{font-variation-settings:"FILL" 1,"wght" 500,"GRAD" 0,"opsz" 24}
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+  .loginov{position:fixed;inset:0;z-index:100;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:24px}
+  .loginbox{width:100%;max-width:330px;display:flex;flex-direction:column;gap:11px;text-align:center}
+  .loginbox h2{font-family:var(--disp);font-weight:700;font-size:28px;margin:0;letter-spacing:-.02em}
+  .loginbox p{margin:0 0 6px;color:var(--muted);font-size:14px}
+  .loginbox input{font-family:var(--body);font-size:15px;width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink)}
+  .loginbox input:focus{outline:none;border-color:var(--muted)}
+  .lerr{color:var(--red);font-size:13px;min-height:18px}
 </style>
 
 <div class="app">
@@ -194,7 +201,14 @@ function seed(){
 /* ====== Firebase (opcional) — sincroniza entre os aparelhos da Sah e do Dan ======
    Crie um projeto grátis em firebase.google.com, ative o Firestore e cole o objeto
    de config abaixo (no lugar de null). Enquanto for null, salva só neste aparelho. */
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBKNGNEci-aGa7oBpChvU5IlnNWtjFiOrk",
+  authDomain: "casa-sah-dan.firebaseapp.com",
+  projectId: "casa-sah-dan",
+  storageBucket: "casa-sah-dan.firebasestorage.app",
+  messagingSenderId: "299406597251",
+  appId: "1:299406597251:web:aa9d1d6f6e8b55cef5cfb6"
+};
 const FB_DOC = "casa/organizacao";
 
 /* ====== persistência: Firebase -> localStorage -> memória ====== */
@@ -203,17 +217,45 @@ async function initStore(){
   if(FIREBASE_CONFIG){
     try{
       const app=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const authMod=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
       const fs=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-      const a=app.initializeApp(FIREBASE_CONFIG); const db=fs.getFirestore(a);
+      const a=app.initializeApp(FIREBASE_CONFIG); const auth=authMod.getAuth(a); const db=fs.getFirestore(a);
+      let user=await new Promise(r=>{ const off=authMod.onAuthStateChanged(auth,u=>{off();r(u);}); });
+      if(!user) await fbLogin(authMod,auth);
       store.fb={fs,db,ref:fs.doc(db,FB_DOC)}; store.mode="fb"; return;
     }catch(e){ console.warn("Firebase falhou, usando local",e); }
   }
   try{ localStorage.setItem("__t","1"); localStorage.removeItem("__t"); store.mode="local"; }
   catch(e){ store.mode="mem"; }
 }
+function fbLogin(authMod,auth){
+  return new Promise(resolve=>{
+    const ov=document.createElement("div"); ov.className="loginov";
+    ov.innerHTML=`<form class="loginbox">
+      <h2>Casa</h2>
+      <p>Entre pra sincronizar entre você e a Sah</p>
+      <input type="email" id="lEmail" placeholder="E-mail" autocomplete="username">
+      <input type="password" id="lPass" placeholder="Senha" autocomplete="current-password">
+      <div class="lerr" id="lErr"></div>
+      <button type="submit" class="btn pri">Entrar</button></form>`;
+    document.body.appendChild(ov);
+    ov.querySelector("form").addEventListener("submit",async ev=>{
+      ev.preventDefault();
+      const btn=ov.querySelector("button"), err=ov.querySelector("#lErr");
+      err.textContent=""; btn.disabled=true; btn.textContent="Entrando…";
+      try{
+        await authMod.signInWithEmailAndPassword(auth, ov.querySelector("#lEmail").value.trim(), ov.querySelector("#lPass").value);
+        ov.remove(); resolve();
+      }catch(e){ err.textContent="E-mail ou senha incorretos."; btn.disabled=false; btn.textContent="Entrar"; }
+    });
+  });
+}
 async function loadData(){
   try{
-    if(store.mode==="fb"){ const s=await store.fb.fs.getDoc(store.fb.ref); if(s.exists()) return normalize(s.data().d); }
+    if(store.mode==="fb"){
+      try{ const s=await store.fb.fs.getDoc(store.fb.ref); if(s.exists()) return normalize(s.data().d); }
+      catch(e){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); throw e; }
+    }
     else if(store.mode==="local"){ const r=localStorage.getItem("casa_org"); if(r) return normalize(JSON.parse(r)); }
     else if(store.mem) return normalize(store.mem);
   }catch(e){ console.warn(e); }
@@ -224,7 +266,7 @@ function save(){
   clearTimeout(saveT);
   saveT=setTimeout(async()=>{
     try{
-      if(store.mode==="fb"){ await store.fb.fs.setDoc(store.fb.ref,{d:D}); }
+      if(store.mode==="fb"){ try{localStorage.setItem("casa_org",JSON.stringify(D));}catch(_){} await store.fb.fs.setDoc(store.fb.ref,{d:D}); }
       else if(store.mode==="local"){ localStorage.setItem("casa_org",JSON.stringify(D)); }
       else { store.mem=JSON.parse(JSON.stringify(D)); }
     }catch(e){ console.warn("save",e); }
