@@ -1,16 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Casa — Samara &amp; Daniel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- PWA: app instalável no celular -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F8F4E3">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Casa">
 <style>
   :root{
-    --paper:#F8F4E3; --surface:#FEFCF7; --ink:#5A352A; --muted:#82704E; --line:#E2D8BC; --soft:#F1EAD2;
+    --paper:#F8F4E3; --surface:#FEFCF7; --ink:#5A352A; --muted:#73603F; --line:#E2D8BC; --soft:#F1EAD2;
     --sam-bg:#E7ECDF; --sam:#3F5238; --sam-dot:#5B7553;
     --dan-bg:#EDE3D6; --dan:#5A352A; --dan-dot:#835033;
     --jun-bg:#F5E2D7; --jun:#7A2E18; --jun-dot:#A33B20;
-    --done:#B7AC8E;
+    --done:#7E7252;
     --disp:"Bricolage Grotesque", system-ui, sans-serif;
     --body:"Inter", system-ui, sans-serif;
   }
@@ -20,6 +31,11 @@
   .wrap{width:100%;max-width:560px}
   .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0}
   h1{font-family:var(--disp);font-weight:700;font-size:34px;letter-spacing:-.02em;margin:2px 0 0}
+  .toprow{display:flex;align-items:center;gap:12px}
+  .back{flex:0 0 auto;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;color:var(--ink);text-decoration:none}
+  .back svg{width:20px;height:20px}
+  .back:active{transform:scale(.96)}
   /* progress */
   .top{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);
     border-radius:20px;padding:18px 20px;margin:18px 0 8px}
@@ -81,7 +97,7 @@
     text-underline-offset:2px;font-family:var(--body)}
   .note{font-size:12px;color:var(--muted)}
   .loading{text-align:center;color:var(--muted);padding:60px 0;font-size:14px}
-  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+  @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 
 <div class="wrap" id="app">
@@ -176,8 +192,10 @@ function render(){
   REMINDERS.forEach(r=>{ rem += `<div class="rem"><span class="d" style="background:var(--${r.who}-dot)"></span><span>${r.t}</span></div>`; });
 
   document.getElementById("app").innerHTML = `
-    <p class="eyebrow">Cuidados da casa</p>
-    <h1>Casa</h1>
+    <div class="toprow">
+      <a class="back" href="index.html" aria-label="Voltar ao início" title="Início"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+      <div><p class="eyebrow">Cuidados da casa</p><h1>Casa</h1></div>
+    </div>
     <div class="top">
       <div class="ring">
         <svg width="84" height="84"><circle cx="42" cy="42" r="36" fill="none" stroke="var(--line)" stroke-width="8"/>
@@ -186,7 +204,7 @@ function render(){
         <div class="num"><b>${done}/${total}</b><span>feitas</span></div>
       </div>
       <div class="topmeta">
-        <h2>${left===0?"Tudo em dia 🎉":`Faltam ${left}`}</h2>
+        <h2>${left===0?'Tudo em dia <span aria-hidden="true">🎉</span>':`Faltam ${left}`}</h2>
         <p>${fmtRange()}</p>
       </div>
     </div>
@@ -230,3 +248,11 @@ function render(){
 
 load();
 </script>
+<script>
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
+</script>
+</html>

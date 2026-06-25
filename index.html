@@ -1,13 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Casa — Sah &amp; Dan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.7.0/tabler-icons.min.css">
+<!-- Ícones: Material Symbols Outlined. Ao usar um ícone novo, adicione o nome em icon_names abaixo. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward,cleaning_services,home,savings&display=block">
+<!-- PWA: app instalável no celular -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F8F4E3">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Casa">
 <style>
   :root{
-    --paper:#F8F4E3; --surface:#FEFCF7; --ink:#5A352A; --muted:#82704E; --line:#E2D8BC; --soft:#F1EAD2;
+    --paper:#F8F4E3; --surface:#FEFCF7; --ink:#5A352A; --muted:#73603F; --line:#E2D8BC; --soft:#F1EAD2;
     --sam-bg:#E7ECDF; --sam:#3F5238; --sam-dot:#5B7553;
     --dan-bg:#EDE3D6; --dan:#5A352A; --dan-dot:#835033;
     --jun-bg:#F5E2D7; --jun:#7A2E18; --jun-dot:#A33B20;
@@ -17,183 +29,166 @@
     --body:"Inter", system-ui, sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5;
-    padding:22px 16px 60px;display:flex;justify-content:center}
-  .wrap{width:100%;max-width:580px}
-  /* header */
-  .brand{display:flex;align-items:center;gap:10px;color:var(--muted)}
-  .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--ink);color:var(--paper);
-    display:flex;align-items:center;justify-content:center;font-size:17px}
-  .brand b{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:.01em}
-  .brand .tag{margin-left:auto;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
-  .greet{margin:22px 0 4px}
-  .greet h1{font-family:var(--disp);font-weight:700;font-size:32px;letter-spacing:-.02em;margin:0;line-height:1.1}
-  .greet p{margin:6px 0 0;color:var(--muted);font-size:14px}
-  .seclabel{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;
-    margin:30px 4px 12px}
-  /* area card */
-  .area{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:14px;
-    transition:border-color .15s, transform .1s}
-  .area:hover{border-color:var(--line)}
-  .ahead{display:flex;align-items:center;gap:14px;padding:18px 18px;cursor:pointer;position:relative}
-  .ahead::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0}
-  .area.org .ahead::before{background:var(--org)}
-  .area.fin .ahead::before{background:var(--fin)}
-  .aicon{flex:0 0 auto;width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:23px}
-  .area.org .aicon{background:var(--org-bg);color:var(--org-ink)}
-  .area.fin .aicon{background:var(--fin-bg);color:var(--fin-ink)}
-  .atitle{flex:1;min-width:0}
-  .atitle h2{font-family:var(--disp);font-weight:600;font-size:18px;margin:0;line-height:1.2}
-  .atitle p{margin:2px 0 0;color:var(--muted);font-size:13px}
-  .chev{flex:0 0 auto;color:var(--muted);font-size:20px;transition:transform .2s}
-  .area.open .chev{transform:rotate(180deg)}
-  .status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;margin-top:6px}
-  .status.ok{background:var(--org-bg);color:var(--org-ink)}
-  .status.work{background:var(--fin-bg);color:var(--fin-ink)}
-  .status .dt{width:6px;height:6px;border-radius:50%;background:currentColor}
-  /* expandable body */
-  .abody{max-height:0;overflow:hidden;transition:max-height .28s ease}
-  .area.open .abody{max-height:760px}
-  .abody-in{padding:4px 18px 20px}
-  .divider{height:1px;background:var(--line);margin:0 0 16px}
-  /* metric chips */
-  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-  .metric{background:var(--soft);border-radius:13px;padding:12px 12px}
-  .metric .k{font-size:11px;color:var(--muted);font-weight:500;line-height:1.3}
-  .metric .v{font-family:var(--disp);font-weight:600;font-size:18px;margin-top:5px;letter-spacing:-.01em}
-  .metric .v.fin{color:var(--fin-ink)}
-  /* today task mini list */
-  .todayline{font-size:13px;color:var(--muted);margin:0 0 10px}
-  .tlist{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
-  .titem{display:flex;align-items:center;gap:10px;font-size:14px}
-  .titem .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
-  .titem.sam .d{background:var(--sam-dot)} .titem.dan .d{background:var(--dan-dot)} .titem.jun .d{background:var(--jun-dot)}
-  .titem .who{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted)}
-  .empty{font-size:14px;color:var(--muted);padding:4px 0 12px}
-  /* feature list */
-  .feat{font-size:13.5px;color:var(--ink);margin:0 0 12px}
-  .feat ul{margin:8px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
-  .feat li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink)}
-  .feat li i{color:var(--fin);font-size:16px;margin-top:1px}
-  .note{font-size:12.5px;color:var(--muted);background:var(--soft);border-radius:11px;padding:10px 12px;margin-bottom:14px;line-height:1.5}
-  /* open button */
-  .open-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;
-    font-family:var(--body);font-size:15px;font-weight:600;border:0;cursor:pointer;text-decoration:none;transition:.12s}
-  .area.org .open-btn{background:var(--org);color:#fff}
-  .area.fin .open-btn{background:var(--fin-bg);color:var(--fin-ink);border:1px solid #E2D8BC}
-  .open-btn:active{transform:scale(.99)}
-  .foot{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
-  @media (max-width:420px){.feat ul{grid-template-columns:1fr}}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+    min-height:100dvh;display:flex;justify-content:center;
+    padding:max(26px,env(safe-area-inset-top)) 18px calc(46px + env(safe-area-inset-bottom));
+    overflow-x:hidden}
+  /* textura de papel — estática, plana, bem sutil */
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  /* ícone */
+  .ms{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;font-size:inherit;
+    line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;
+    word-wrap:normal;direction:ltr;vertical-align:middle;-webkit-font-smoothing:antialiased;
+    font-feature-settings:"liga";font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24}
+
+  .wrap{width:100%;max-width:600px;position:relative;z-index:1}
+
+  /* topo / marca */
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .mark{width:34px;height:34px;border-radius:11px;background:var(--ink);color:var(--paper);
+    display:flex;align-items:center;justify-content:center;font-size:20px}
+  .brand b{font-family:var(--disp);font-weight:600;font-size:16px;letter-spacing:.01em}
+  .brand .tag{margin-left:auto;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:600;color:var(--muted)}
+
+  /* herói / saudação */
+  .hero{margin:34px 2px 6px}
+  .kick{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(34px,11vw,46px);letter-spacing:-.025em;
+    line-height:1.02;margin:12px 0 0;text-wrap:balance}
+  .hero .sub{margin:12px 0 0;color:var(--muted);font-size:14.5px;text-wrap:pretty;max-width:34ch}
+  .hero .sub b{color:var(--ink);font-weight:600}
+
+  /* rótulo de seção */
+  .seclabel{display:flex;align-items:center;gap:12px;margin:34px 2px 16px;
+    font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .seclabel::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* as duas "portas" */
+  .choices{display:flex;flex-direction:column;gap:14px}
+  .choice{position:relative;display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;
+    background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;
+    overflow:hidden;transition:transform .18s ease,border-color .18s ease}
+  .choice::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:4px;border-radius:0 4px 4px 0}
+  .choice.org::before{background:var(--org)} .choice.fin::before{background:var(--fin)}
+  .choice .num{position:absolute;right:14px;bottom:-12px;font-family:var(--disp);font-weight:700;
+    font-size:84px;line-height:1;letter-spacing:-.04em;opacity:.05;pointer-events:none}
+  .tile{flex:0 0 auto;width:58px;height:58px;border-radius:17px;display:flex;align-items:center;
+    justify-content:center;font-size:30px;transition:transform .18s ease}
+  .choice.org .tile{background:var(--org-bg);color:var(--org-ink)}
+  .choice.fin .tile{background:var(--fin-bg);color:var(--fin-ink)}
+  .body{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+  .body .ck{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+  .choice.org .body .ck{color:var(--org)} .choice.fin .body .ck{color:var(--fin)}
+  .body h2{font-family:var(--disp);font-weight:600;font-size:21px;letter-spacing:-.01em;margin:3px 0 0;line-height:1.15}
+  .body .desc{margin:3px 0 0;color:var(--muted);font-size:13px}
+  .chip{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:11.5px;font-weight:600;
+    padding:4px 10px;border-radius:999px}
+  .choice.org .chip{background:var(--org-bg);color:var(--org-ink)}
+  .choice.fin .chip{background:var(--fin-bg);color:var(--fin-ink)}
+  .chip .dt{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .go{flex:0 0 auto;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--muted);
+    transition:background .18s ease,color .18s ease,border-color .18s ease}
+  .go .ms{transition:transform .18s ease}
+
+  /* interação (desktop hover + toque) */
+  @media (hover:hover){
+    .choice:hover{transform:translateY(-3px)}
+    .choice.org:hover{border-color:var(--org)} .choice.fin:hover{border-color:var(--fin)}
+    .choice:hover .tile{transform:scale(1.05)}
+    .choice.org:hover .go{background:var(--org);border-color:var(--org);color:#fff}
+    .choice.fin:hover .go{background:var(--fin);border-color:var(--fin);color:#fff}
+    .choice:hover .go .ms{transform:translateX(3px)}
+  }
+  .choice:active{transform:translateY(-1px) scale(.992)}
+
+  .foot{margin-top:34px;text-align:center;color:var(--muted);font-size:12px;line-height:1.7}
+  .foot .ms{font-size:14px;vertical-align:-.18em;opacity:.7}
+
+  /* entrada em cascata — só transform/opacity */
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .r{animation:rise .55s ease-out both;animation-delay:var(--d,0s)}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
 </style>
 
 <div class="wrap">
-  <div class="brand">
-    <span class="mark"><i class="ti ti-home"></i></span>
+  <header class="brand r" style="--d:0s">
+    <span class="mark"><span class="ms" aria-hidden="true">home</span></span>
     <b>Casa</b>
-    <span class="tag" id="weekday" style="color:var(--muted)"></span>
-  </div>
+    <span class="tag" id="weekday"></span>
+  </header>
 
-  <div class="greet">
-    <h1 id="hello">Olá</h1>
-    <p id="subdate"></p>
-  </div>
+  <section class="hero">
+    <p class="kick r" style="--d:.06s">Sistema da casa · Sah &amp; Dan</p>
+    <h1 class="r" id="hello" style="--d:.12s">Olá</h1>
+    <p class="sub r" id="subline" style="--d:.18s"></p>
+  </section>
 
-  <div class="seclabel">Áreas</div>
+  <div class="seclabel r" style="--d:.24s">O que vocês querem abrir</div>
 
-  <!-- ORGANIZAÇÃO -->
-  <div class="area org" id="cardOrg">
-    <div class="ahead" data-toggle="cardOrg">
-      <span class="aicon"><i class="ti ti-sparkles"></i></span>
-      <span class="atitle">
+  <nav class="choices" aria-label="Áreas da casa">
+    <a class="choice org r" href="organizacao.html" style="--d:.3s">
+      <span class="num" aria-hidden="true">01</span>
+      <span class="tile"><span class="ms" aria-hidden="true">cleaning_services</span></span>
+      <div class="body">
+        <span class="ck">Organização</span>
         <h2>Organização &amp; limpeza</h2>
-        <p>Rotina da semana, faxina e roupa</p>
-        <span class="status ok"><span class="dt"></span><span id="orgStatus">—</span></span>
-      </span>
-      <i class="ti ti-chevron-down chev"></i>
-    </div>
-    <div class="abody"><div class="abody-in">
-      <div class="divider"></div>
-      <p class="todayline" id="todayLabel"></p>
-      <div class="tlist" id="todayTasks"></div>
-      <a class="open-btn" href="organizacao.html"><i class="ti ti-arrow-right"></i> Abrir o painel da semana</a>
-    </div></div>
-  </div>
-
-  <!-- FINANÇAS -->
-  <div class="area fin" id="cardFin">
-    <div class="ahead" data-toggle="cardFin">
-      <span class="aicon"><i class="ti ti-wallet"></i></span>
-      <span class="atitle">
-        <h2>Finanças</h2>
-        <p>Orçamento, dívidas e metas</p>
-        <span class="status work"><span class="dt"></span>Plano em andamento</span>
-      </span>
-      <i class="ti ti-chevron-down chev"></i>
-    </div>
-    <div class="abody"><div class="abody-in">
-      <div class="divider"></div>
-      <div class="metrics">
-        <div class="metric"><div class="k">Sobra planejada / mês</div><div class="v fin" id="mSobra">—</div></div>
-        <div class="metric"><div class="k">Pra virar o jogo</div><div class="v fin" id="mMeses">—</div></div>
-        <div class="metric"><div class="k">Dívida a quitar</div><div class="v fin" id="mDivida">—</div></div>
+        <span class="desc">Rotina da semana, faxina e roupa</span>
+        <span class="chip"><span class="dt"></span><span id="orgStatus">—</span></span>
       </div>
-      <div class="note"><i class="ti ti-bulb" style="color:var(--fin)"></i> O custo de viver cabe na renda — o aperto é a bola de neve dos cartões e empréstimos. Com o plano, vira em poucos meses.</div>
-      <p class="feat">O que esta área vai ter:</p>
-      <div class="feat"><ul>
-        <li><i class="ti ti-receipt"></i> Contas fixas e parcelas</li>
-        <li><i class="ti ti-credit-card"></i> Gastos por cartão</li>
-        <li><i class="ti ti-target"></i> Metas por categoria</li>
-        <li><i class="ti ti-chart-pie"></i> Relatórios em gráficos</li>
-        <li><i class="ti ti-stairs-up"></i> Plano pra quitar dívidas</li>
-        <li><i class="ti ti-user-shield"></i> Gastos pessoais privados</li>
-      </ul></div>
-      <a class="open-btn" href="financas.html"><i class="ti ti-arrow-right"></i> Abrir finanças</a>
-    </div></div>
-  </div>
+      <span class="go"><span class="ms" aria-hidden="true">arrow_forward</span></span>
+    </a>
 
-  <div class="foot">Sah &amp; Dan · sistema da casa<br>Números de finanças vindos da planilha atual</div>
+    <a class="choice fin r" href="financas.html" style="--d:.38s">
+      <span class="num" aria-hidden="true">02</span>
+      <span class="tile"><span class="ms" aria-hidden="true">savings</span></span>
+      <div class="body">
+        <span class="ck">Finanças</span>
+        <h2>Finanças</h2>
+        <span class="desc">Orçamento, dívidas e metas</span>
+        <span class="chip"><span class="dt"></span>Plano em andamento</span>
+      </div>
+      <span class="go"><span class="ms" aria-hidden="true">arrow_forward</span></span>
+    </a>
+  </nav>
+
+  <p class="foot r" style="--d:.48s">Sah &amp; Dan · feito em casa <span class="ms" aria-hidden="true">home</span></p>
 </div>
 
 <script>
 const TASKS = [
-  {day:"Segunda", label:"Roupa clara na lava e seca", who:"sam"},
-  {day:"Terça", label:"Banheiro — passada rápida", who:"sam"},
-  {day:"Quarta", label:"Roupa escura na lava e seca", who:"sam"},
-  {day:"Quarta", label:"Passar pano — sala + cozinha", who:"dan"},
-  {day:"Sexta", label:"Tirar pó + organizar os quartos", who:"sam"},
-  {day:"Sexta", label:"Faxina pesada do banheiro", who:"dan"},
-  {day:"Sábado", label:"Faxina da cozinha", who:"sam"},
-  {day:"Sábado", label:"Passar pano — casa toda", who:"jun"},
-  {day:"Sábado", label:"Cama + toalhas + dobrar a roupa", who:"dan"},
-  {day:"Domingo", label:"Batch cooking + compras", who:"jun"},
+  {day:"Segunda", who:"sam"},{day:"Terça", who:"sam"},{day:"Quarta", who:"sam"},{day:"Quarta", who:"dan"},
+  {day:"Sexta", who:"sam"},{day:"Sexta", who:"dan"},{day:"Sábado", who:"sam"},{day:"Sábado", who:"jun"},
+  {day:"Sábado", who:"dan"},{day:"Domingo", who:"jun"},
 ];
 const DAYS=["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
 const MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
-const WHO={sam:"Samara",dan:"Daniel",jun:"Juntos"};
-const BRL=n=>"R$ "+n.toLocaleString("pt-BR",{maximumFractionDigits:0});
 
-const now=new Date();
-const h=now.getHours();
-document.getElementById("hello").textContent = h<5?"Boa madrugada":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
+const now=new Date(), h=now.getHours();
+const greet = h<5?"Boa madrugada":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
 const wd=DAYS[(now.getDay()+6)%7];
-document.getElementById("weekday").textContent=wd;
-document.getElementById("subdate").textContent=`Hoje é ${wd.toLowerCase()}, ${now.getDate()} de ${MES[now.getMonth()]}`;
 
-const todays=TASKS.filter(t=>t.day===wd);
-document.getElementById("orgStatus").textContent = todays.length?`${todays.length} tarefa${todays.length>1?"s":""} hoje`:"Dia leve hoje";
-document.getElementById("todayLabel").textContent = todays.length?`Pra hoje (${wd.toLowerCase()}):`:`Nada agendado pra ${wd.toLowerCase()} — dia de respiro.`;
-const tl=document.getElementById("todayTasks");
-if(todays.length){
-  tl.innerHTML=todays.map(t=>`<div class="titem ${t.who}"><span class="d"></span><span>${t.label}</span><span class="who">${WHO[t.who]}</span></div>`).join("");
-}else{ tl.innerHTML=`<div class="empty">Aproveita o dia livre 🌿</div>`; }
+document.getElementById("hello").textContent = greet;
+document.getElementById("weekday").textContent = wd;
+document.getElementById("subline").innerHTML =
+  `Hoje é <b>${wd.toLowerCase()}, ${now.getDate()} de ${MES[now.getMonth()]}</b>. Por onde começamos?`;
 
-document.getElementById("mSobra").textContent=BRL(2353);
-document.getElementById("mMeses").textContent="~6 meses";
-document.getElementById("mDivida").textContent=BRL(35620);
-
-document.querySelectorAll(".ahead").forEach(h=>{
-  h.addEventListener("click",()=>document.getElementById(h.dataset.toggle).classList.toggle("open"));
-});
-document.getElementById("cardOrg").classList.add("open");
+const todays = TASKS.filter(t=>t.day===wd).length;
+document.getElementById("orgStatus").textContent =
+  todays ? `${todays} tarefa${todays>1?"s":""} hoje` : "Dia leve hoje";
 </script>
+<script>
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
+</script>
+</html>
